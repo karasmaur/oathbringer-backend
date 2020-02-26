@@ -1,6 +1,6 @@
-(ns rest-demo.core-test
+(ns oathbringer.core-test
   (:require [clojure.test :refer :all]
-            [rest-demo.core :refer :all]))
+            [oathbringer.core :refer :all]))
 
 (deftest a-test
   (testing "FIXME, I fail."
