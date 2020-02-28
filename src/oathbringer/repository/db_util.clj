@@ -17,10 +17,13 @@
   (d/db conn))
 
 (defn transact [data]
+  (d/transact conn {:tx-data data}))
+
+(defn transact-single-entity [data]
   (d/transact conn {:tx-data (list data)}))
 
 (defn query-db [query] (d/q query (get-db)))
 
-(defn convert-datom [transaction-return]
+(defn convert-datom-to-map [transaction-return]
   "Returns a list with only the transacted data from the returned map of d/transact"
   (map #(:v %) (drop 1 (:tx-data transaction-return))))
