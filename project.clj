@@ -14,7 +14,9 @@
                  [org.clojure/data.json "0.2.6"]
                  [com.datomic/client-pro "0.9.43"]
                  [ring/ring-json "0.3.1"]
-                 [nano-id "0.10.0"]]
+                 [nano-id "0.10.0"]
+                 [buddy "2.0.0"]
+ ]
   :main ^:skip-aot oathbringer.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

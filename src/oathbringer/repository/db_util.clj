@@ -22,7 +22,9 @@
 (defn transact-single-entity [data]
   (d/transact conn {:tx-data (list data)}))
 
-(defn query-db [query] (d/q query (get-db)))
+(defn query-db
+  ([query] (d/q query (get-db)))
+  ([query parameter] (d/q query (get-db) parameter)))
 
 (defn convert-datom-to-map [transaction-return]
   "Returns a list with only the transacted data from the returned map of d/transact"
