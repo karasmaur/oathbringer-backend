@@ -6,7 +6,7 @@
             [ring.util.response :refer [response]]
             [ring.middleware.json :as ringJson]
             [oathbringer.service.user :refer [add-user-handler get-all-users-handler user-login-handler]]
-            [oathbringer.service.auth :refer [backend rules on-error]]
+            [oathbringer.service.auth :refer [rules on-error]]
             [oathbringer.service.example :refer [request-example]]
             [buddy.auth.accessrules :refer (wrap-access-rules)])
   (:gen-class))

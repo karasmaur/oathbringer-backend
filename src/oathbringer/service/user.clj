@@ -1,7 +1,7 @@
 (ns oathbringer.service.user
   (:require [oathbringer.repository.user :refer [create-user find-all-users email-exists? password-match?]]
             [clojure.data.json :as json]
-            [oathbringer.service.auth :refer [generate-signature]]))
+            [oathbringer.service.auth :refer [generate-signature generate-expiration-date]]))
 
 (defn response-payload [status body]
   "Returns a map accepted by the http server. To be used on response with json objects as body."
@@ -22,9 +22,10 @@
 (defn user-login-handler [req]
   "Returns true if the user credentials are correct"
   (let [email ((partial getparameter req) :email)
-        password ((partial getparameter req) :password)]
+        password ((partial getparameter req) :password)
+        token-info {:email email :permission "general" :exp (generate-expiration-date)}]
     (if (email-exists? email)
       (if (password-match? email password)
-        (response-payload 200 {:token (generate-signature {:email email :permission "general"}) :message "Signed in!"} )
+        (response-payload 200 {:token (generate-signature token-info) :message "Signed in!"})
         (response-payload 406 {:message "Wrong password!"}))
       (response-payload 406 {:message "User doesn't exist!"}))))
