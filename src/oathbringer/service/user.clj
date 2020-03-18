@@ -1,7 +1,8 @@
 (ns oathbringer.service.user
   (:require [oathbringer.repository.user :refer [create-user find-all-users email-exists? password-match?]]
             [clojure.data.json :as json]
-            [oathbringer.service.auth :refer [generate-signature generate-expiration-date]]))
+            [oathbringer.service.auth :refer [generate-signature generate-expiration-date]]
+            [clojure.pprint :as pp]))
 
 (defn response-payload [status body]
   "Returns a map accepted by the http server. To be used on response with json objects as body."
@@ -24,6 +25,7 @@
   (let [email ((partial getparameter req) :email)
         password ((partial getparameter req) :password)
         token-info {:email email :permission "general" :exp (generate-expiration-date)}]
+    (pp/pprint (str "User logged in: " email))
     (if (email-exists? email)
       (if (password-match? email password)
         (response-payload 200 {:token (generate-signature token-info) :message "Signed in!"})

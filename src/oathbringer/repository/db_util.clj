@@ -27,5 +27,6 @@
   ([query parameter] (d/q query (get-db) parameter)))
 
 (defn convert-datom-to-map [transaction-return]
-  "Returns a list with only the transacted data from the returned map of d/transact"
+  "Returns a list with only the transacted data from the returned map of d/transact.
+  This is need to get the data that returns when you add something to the database."
   (map #(:v %) (drop 1 (:tx-data transaction-return))))
