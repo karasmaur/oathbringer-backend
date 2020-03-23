@@ -56,6 +56,10 @@
                                   [?e :user/name ?name]
                                   [?e :user/email ?email]])
 
+(def user-id-by-external-id '[:find ?e
+                          :in $ ?external-id
+                          :where [?e :user/external-id ?external-id]])
+
 (def user-password-by-email '[:find ?password
                               :in $ ?user-email
                               :where [?e :user/email ?user-email]
@@ -76,5 +80,6 @@
   "Returns a list of all users in datomic"
   (map user-return (query-db all-users-query)))
 
-
+(defn find-user-id [external-id]
+  (ffirst (query-db user-id-by-external-id external-id)))
 
