@@ -1,9 +1,10 @@
 (ns oathbringer.repository.holder
-  (:require [oathbringer.repository.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
+  (:require [oathbringer.util.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
             [nano-id.core :refer [nano-id]]))
 
 (defn create-holder-tx [char-id holder]
-  {:holder/character char-id
+  {:holder/external-id (nano-id 10)
+   :holder/character char-id
    :holder/name (:name holder)
    :holder/main (:main holder)
    :holder/size (:size holder)
@@ -12,8 +13,16 @@
    :holder/current-weight (:current-weight holder)
    :holder/overencumbered (:overencumbered holder)})
 
+(defn create-items-holder-tx [holder-external-id item-external-id quantity]
+  {:items/holder holder-external-id
+   :items/item item-external-id
+   :items/quantity quantity})
+
 (defn create-holder [char-external-id holder]
   (transact-single-entity (create-holder-tx {:character/external-id char-external-id} holder)))
+
+(defn add-item [holder-external-id item-external-id quantity]
+  (transact-single-entity (create-items-holder-tx {:holder/external-id holder-external-id} {:item/external-id item-external-id} quantity)))
 
 (def find-all-holders-by-user-query '[:find ?holder-name ?size
                                             :in $ ?user
@@ -24,8 +33,27 @@
                                             [?h :holder/name ?holder-name]
                                             [?h :holder/size ?size]])
 
+(def holder-items-schema
+  [{:db/ident       :items/holder
+    :db/valueType   :db.type/ref
+    :db/cardinality :db.cardinality/one
+    :db/doc         "This characters's holders(e.g. himself, horses, wagons, etc.)"}
+   {:db/ident       :items/item
+     :db/valueType   :db.type/ref
+     :db/cardinality :db.cardinality/one
+     :db/doc         "This holder's items"}
+   {:db/ident       :items/quantity
+    :db/valueType   :db.type/long
+    :db/cardinality :db.cardinality/one
+    :db/doc         "An item's quantity"}])
+
 (def holder-schema
   [ ;; Character/Holders
+   {:db/ident       :holder/external-id
+    :db/valueType   :db.type/string
+    :db/cardinality :db.cardinality/one
+    :db/unique      :db.unique/identity
+    :db/doc         "A holder's external ID to be exposed in the API"}
    {:db/ident       :holder/character
     :db/valueType   :db.type/ref
     :db/cardinality :db.cardinality/one

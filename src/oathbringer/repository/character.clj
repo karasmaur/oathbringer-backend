@@ -1,5 +1,5 @@
 (ns oathbringer.repository.character
-  (:require [oathbringer.repository.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
+  (:require [oathbringer.util.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
             [nano-id.core :refer [nano-id]]))
 
 (defn create-character-tx [user-id character]

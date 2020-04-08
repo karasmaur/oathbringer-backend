@@ -1,4 +1,4 @@
-(ns oathbringer.repository.db-util
+(ns oathbringer.util.db-util
   (:require   [datomic.client.api :as d]))
 
 (def cfg {:server-type :peer-server

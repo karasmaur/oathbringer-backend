@@ -1,5 +1,5 @@
 (ns oathbringer.repository.user
-  (:require [oathbringer.repository.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
+  (:require [oathbringer.util.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
             [nano-id.core :refer [nano-id]]
             [buddy.hashers :as hashers]))
 
