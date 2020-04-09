@@ -2,28 +2,21 @@
   (:require [oathbringer.repository.user :refer [create-user find-all-users email-exists? password-match?]]
             [clojure.data.json :as json]
             [oathbringer.service.auth :refer [generate-signature generate-expiration-date]]
-            [clojure.pprint :as pp]))
-
-(defn response-payload [status body]
-  "Returns a map accepted by the http server. To be used on response with json objects as body."
-  {:status  status
-   :headers {"Content-Type" "text/json"}
-   :body    (json/write-str body)})
-
-; Helper to get the parameter specified by pname from :params object in req
-(defn getparameter [req pname] (get (:params req) pname))
+            [clojure.pprint :as pp]
+            [oathbringer.util.service-util :refer [get-parameter response-payload]]))
 
 (defn get-all-users-handler [req]
   (find-all-users))
 
 (defn add-user-handler [req]
-  (-> (let [user (partial getparameter req)]
+  (-> (let [user (partial get-parameter req)]
         (create-user user))))
 
+;; TODO: Add the user-external-id to the token.
 (defn user-login-handler [req]
   "Returns true if the user credentials are correct"
-  (let [email ((partial getparameter req) :email)
-        password ((partial getparameter req) :password)
+  (let [email ((partial get-parameter req) :email)
+        password ((partial get-parameter req) :password)
         token-info {:email email :permission "general" :exp (generate-expiration-date)}]
     (pp/pprint (str "User logged in: " email))
     (if (email-exists? email)

@@ -42,3 +42,7 @@
   {:status 403
    :headers {}
    :body (str "Not authorized: " value)})
+
+;; TODO: Check if there's a way to pass the external-id directly to the handler
+(defn get-user-external-id [req]
+  (:external-id (unsign-token (get-jwt req))))
