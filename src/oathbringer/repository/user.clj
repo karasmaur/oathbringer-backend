@@ -24,7 +24,7 @@
 
 (defn user-return [user]
   "Returns a map with the user's fields"
-  {:external-id (nth user 0) :name (nth user 1) :email (nth user 2)})
+  {:external-id (nth user 0) :name (nth user 1) :email (nth user 2) :password (nth user 3)})
 
 (defn convert-to-datomic-map [user]
   "Returns a user map prepared to add in Datomic."
@@ -49,12 +49,13 @@
                                                    [?e :user/password ?password]
                                                    [?e :user/external-id user-external-id]])
 
-(def user-by-email-query '[:find ?external-id ?name ?email
+(def user-by-email-query '[:find ?external-id ?name ?email ?password
                            :in $ ?user-email
                            :where [?e :user/email ?user-email]
                                   [?e :user/external-id ?external-id]
                                   [?e :user/name ?name]
-                                  [?e :user/email ?email]])
+                                  [?e :user/email ?email]
+                                  [?e :user/password ?password]])
 
 (def user-id-by-external-id '[:find ?e
                           :in $ ?external-id
@@ -65,16 +66,15 @@
                               :where [?e :user/email ?user-email]
                                      [?e :user/password ?password]])
 
-(defn password-match? [email password]
+(defn password-match? [provided-password password]
   "Check to see if the password given matches the digest of the user's saved password"
-  (hashers/check password (ffirst (query-db user-password-by-email email))))
+  (hashers/check password provided-password))
 
-(defn email-exists? [email]
-  "Returns true if the user's email exists in the database."
-  (if (= (query-db user-by-email-query email) '[])
-    false
-    true))
-
+(defn get-user [email]
+  (let [user (first (query-db user-by-email-query email))]
+    (if (nil? user)
+      nil
+      (user-return user))))
 
 (defn find-all-users []
   "Returns a list of all users in datomic"

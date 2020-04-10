@@ -8,3 +8,6 @@
   (let [char (partial get-parameter req)
         user-external-id (get-user-external-id req)]
     (create-character user-external-id char)))
+
+(defn get-all-characters [req]
+  ())

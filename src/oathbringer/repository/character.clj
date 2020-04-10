@@ -1,14 +1,21 @@
 (ns oathbringer.repository.character
   (:require [oathbringer.util.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
-            [nano-id.core :refer [nano-id]]))
+            [nano-id.core :refer [nano-id]]
+            [clojure.pprint :as pp]))
 
 (defn create-character-tx [user-id character]
   {:character/external-id (nano-id 10)
    :character/user user-id
-   :character/name (character :name)})
+   :character/name (str (character :name))})
+
+(defn char-return [char]
+  {:external-id (nth char 0)
+   :name (nth char 2)})
 
 (defn create-character [user-external-id character]
-  (transact-single-entity (create-character-tx {:user/external-id user-external-id} character)))
+  (let [created-char (transact-single-entity
+                       (create-character-tx {:user/external-id user-external-id} character))]
+    (char-return (convert-datom-to-map created-char))))
 
 (def character-id-by-external-id-query '[:find ?e
                                    :in $ ?external-id
