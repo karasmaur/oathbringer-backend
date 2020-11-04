@@ -1,32 +1,20 @@
 (ns oathbringer.util.db-util
-  (:require   [datomic.client.api :as d]))
+  (:require [monger.core :as mg]
+            [monger.collection :as mc]))
 
-(def cfg {:server-type :peer-server
-          :access-key "myaccesskey"
-          :secret "mysecret"
-          :endpoint "localhost:8998"
-          :validate-hostnames false})
+(def connect (mg/connect {:host "localhost" :port 27017}))
 
-(def client (d/client cfg))
+(def database
+  (mg/get-db connect "oathbringer"))
 
-(def conn (d/connect client {:db-name "hello"}))
+(defn save-to-db [collection data] (mc/insert-and-return database collection data))
 
-(defn get-db
-  "Returns de database from the connection"
-  []
-  (d/db conn))
+(defn find-in-db [collection query] (mc/find-one database collection query))
 
-(defn transact [data]
-  (d/transact conn {:tx-data data}))
+(defn find-oid [collection query] (get (mc/find-one database collection query) "_id"))
 
-(defn transact-single-entity [data]
-  (d/transact conn {:tx-data (list data)}))
-
-(defn query-db
-  ([query] (d/q query (get-db)))
-  ([query parameter] (d/q query (get-db) parameter)))
-
-(defn convert-datom-to-map [transaction-return]
-  "Returns a list with only the transacted data from the returned map of d/transact.
-  This is need to get the data that returns when you add something to the database."
-  (map #(:v %) (drop 1 (:tx-data transaction-return))))
+(defn update-to-db [collection data]
+  (mc/update-by-id database
+                   collection
+                   (find-oid collection {:external-id (data :external-id)})
+                   data))

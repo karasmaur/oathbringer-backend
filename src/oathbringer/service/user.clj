@@ -1,12 +1,9 @@
 (ns oathbringer.service.user
-  (:require [oathbringer.repository.user :refer [create-user find-all-users get-user password-match?]]
+  (:require [oathbringer.repository.user :refer [create-user get-user password-match?]]
             [clojure.data.json :as json]
             [oathbringer.service.auth :refer [generate-signature generate-expiration-date]]
             [clojure.pprint :as pp]
             [oathbringer.util.service-util :refer [get-parameter response-payload]]))
-
-(defn get-all-users-handler [req]
-  (find-all-users))
 
 (defn add-user-handler [req]
   (-> (let [user (partial get-parameter req)]

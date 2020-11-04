@@ -5,7 +5,7 @@
             [ring.middleware.defaults :refer :all]
             [ring.util.response :refer [response]]
             [ring.middleware.json :as ringJson]
-            [oathbringer.service.user :refer [add-user-handler get-all-users-handler user-login-handler]]
+            [oathbringer.service.user :refer [add-user-handler user-login-handler]]
             [oathbringer.service.character :refer [add-character-handler get-all-characters]]
             [oathbringer.service.auth :refer [rules on-error]]
             [oathbringer.service.example :refer [request-example]]
@@ -16,7 +16,6 @@
            (context "/api" []
              (context "/user" []
                (POST "/" req (response (add-user-handler req)) )
-               (GET "/" req (response (get-all-users-handler req)))
                (POST "/login" req (user-login-handler req)))
              (context "/character" []
                (POST "/" req (response (add-character-handler req)))

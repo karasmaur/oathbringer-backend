@@ -1,85 +1,29 @@
 (ns oathbringer.repository.user
-  (:require [oathbringer.util.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
+  (:require [oathbringer.util.db-util :refer [save-to-db find-in-db]]
             [nano-id.core :refer [nano-id]]
             [buddy.hashers :as hashers]))
 
-(def user-schema [{:db/ident        :user/external-id
-                   :db/valueType   :db.type/string
-                   :db/cardinality :db.cardinality/one
-                   :db/unique :db.unique/identity
-                   :db/doc         "A user's external ID to be exposed in the API"}
-                  {:db/ident        :user/name
-                   :db/valueType   :db.type/string
-                   :db/cardinality :db.cardinality/one
-                   :db/doc         "A user's complete name"}
-                  {:db/ident        :user/email
-                   :db/valueType    :db.type/string
-                   :db/unique :db.unique/identity
-                   :db/cardinality  :db.cardinality/one
-                   :db/doc          "A user's e-mail"}
-                  {:db/ident         :user/password
-                   :db/valueType    :db.type/string
-                   :db/cardinality  :db.cardinality/one
-                   :db/doc          "A user's hashed password"}])
+(def collection "users")
 
-(defn user-return [user]
+(defn get-user-dto [user]
   "Returns a map with the user's fields"
-  {:external-id (nth user 0) :name (nth user 1) :email (nth user 2) :password (nth user 3)})
+  {:external-id (get user "external-id")
+   :name (get user "name")
+   :email (get user "email")
+   :password (get user "password")})
 
-(defn convert-to-datomic-map [user]
-  "Returns a user map prepared to add in Datomic."
-  {:user/external-id (nano-id 10)
-   :user/name (str (user :name))
-   :user/email (str (user :email))
-   :user/password (hashers/encrypt (str (user :password)))})
+(defn get-user-data [user] {:external-id (nano-id 10)
+                            :email (str (user :email))
+                            :password (hashers/encrypt (str (user :password)))})
 
 (defn create-user [user]
   "Returns the user after transacting it to datomic"
-  (user-return (convert-datom-to-map (transact-single-entity (convert-to-datomic-map user)))))
-
-(def all-users-query '[:find ?external-id ?name ?email
-                       :where [?e :user/external-id ?external-id]
-                              [?e :user/name ?name]
-                              [?e :user/email ?email]])
-
-(defn user-by-id-query [user-external-id] '[:find ?external-id ?name ?email ?password
-                                            :where [?e :user/external-id ?external-id]
-                                                   [?e :user/name ?name]
-                                                   [?e :user/email ?email]
-                                                   [?e :user/password ?password]
-                                                   [?e :user/external-id user-external-id]])
-
-(def user-by-email-query '[:find ?external-id ?name ?email ?password
-                           :in $ ?user-email
-                           :where [?e :user/email ?user-email]
-                                  [?e :user/external-id ?external-id]
-                                  [?e :user/name ?name]
-                                  [?e :user/email ?email]
-                                  [?e :user/password ?password]])
-
-(def user-id-by-external-id '[:find ?e
-                          :in $ ?external-id
-                          :where [?e :user/external-id ?external-id]])
-
-(def user-password-by-email '[:find ?password
-                              :in $ ?user-email
-                              :where [?e :user/email ?user-email]
-                                     [?e :user/password ?password]])
+  (save-to-db collection (get-user-data user)))
 
 (defn password-match? [provided-password password]
   "Check to see if the password given matches the digest of the user's saved password"
   (hashers/check password provided-password))
 
 (defn get-user [email]
-  (let [user (first (query-db user-by-email-query email))]
-    (if (nil? user)
-      nil
-      (user-return user))))
-
-(defn find-all-users []
-  "Returns a list of all users in datomic"
-  (map user-return (query-db all-users-query)))
-
-(defn find-user-id [external-id]
-  (ffirst (query-db user-id-by-external-id external-id)))
+  (get-user-dto (find-in-db collection {:email email})))
 
