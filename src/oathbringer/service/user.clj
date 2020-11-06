@@ -6,8 +6,8 @@
             [oathbringer.util.service-util :refer [get-parameter response-payload]]))
 
 (defn add-user-handler [req]
-  (-> (let [user (partial get-parameter req)]
-        (create-user user))))
+  (response-payload 200 (-> (let [user (partial get-parameter req)]
+                              (create-user user)))))
 
 (defn user-login-handler [req]
   "Returns true if the user credentials are correct"
