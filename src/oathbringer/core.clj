@@ -5,11 +5,8 @@
             [ring.middleware.defaults :refer :all]
             [ring.util.response :refer [response]]
             [ring.middleware.json :as ringJson]
-            [oathbringer.service.user :refer [add-user-handler user-login-handler]]
-            [oathbringer.service.character :refer [add-character-handler
-                                                   update-character-handler
-                                                   get-all-characters
-                                                   delete-character-handler]]
+            [oathbringer.service.user :refer :all]
+            [oathbringer.service.character :refer :all]
             [oathbringer.service.auth :refer [rules on-error]]
             [buddy.auth.accessrules :refer (wrap-access-rules)]
             [oathbringer.middleware.error-handling :refer [wrap-error-handling]])
@@ -19,11 +16,13 @@
            (context "/api" []
              (context "/user" []
                (POST "/" req (add-user-handler req))
-               (POST "/login" req (user-login-handler req)))
+               (POST "/login" req (user-login-handler req))
+               (PUT "/" req (update-user-handler req))
+               (DELETE "/" req (delete-user-handler req)))
              (context "/character" []
                (POST "/" req (add-character-handler req))
-               (PUT "/" req (update-character-handler req))
-               (DELETE "/" req (delete-character-handler req))
+               (PUT "/:id" req (update-character-handler req))
+               (DELETE "/:id" req (delete-character-handler req))
                (GET "/all" req (response (get-all-characters req)))))
            (route/not-found "Error, page not found!"))
 
