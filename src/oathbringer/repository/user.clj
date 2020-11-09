@@ -34,14 +34,14 @@
 (defn find-user [email]
   (get-user-dto (find-in-db user-collection {:email email})))
 
-(defn add-character-to-user [char-external-id char-id]
+(defn add-character-to-user [user-external-id char-id]
   (update-embedded-array-to-db user-collection
-                               {:external-id char-external-id}
+                               {:external-id user-external-id}
                                {:characters {:character_id char-id}}))
 
-(defn remove-character-from-user [char-external-id char-id]
+(defn remove-character-from-user [user-external-id char-id]
   (remove-one-from-embedded-array-to-db user-collection
-                                        {:external-id char-external-id}
+                                        {:external-id user-external-id}
                                         {:characters {:character_id char-id}}))
 
 (defn find-characters-ids-from-user [user-external-id]

@@ -23,7 +23,7 @@
                         "Character updated!")))
 
 (defn delete-character-handler [req]
-  (validate-db-return (delete-character (get-char-external-id req))
+  (validate-db-return (delete-character (get-user-external-id req) (get-char-external-id req))
                       200
                       "Character deleted!"))
 

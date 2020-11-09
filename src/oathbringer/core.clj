@@ -5,9 +5,10 @@
             [ring.middleware.defaults :refer :all]
             [ring.util.response :refer [response]]
             [ring.middleware.json :as ringJson]
+            [oathbringer.service.auth :refer [rules on-error]]
             [oathbringer.service.user :refer :all]
             [oathbringer.service.character :refer :all]
-            [oathbringer.service.auth :refer [rules on-error]]
+            [oathbringer.service.container :refer :all]
             [buddy.auth.accessrules :refer (wrap-access-rules)]
             [oathbringer.middleware.error-handling :refer [wrap-error-handling]])
   (:gen-class))
@@ -19,11 +20,22 @@
                (POST "/login" req (user-login-handler req))
                (PUT "/" req (update-user-handler req))
                (DELETE "/" req (delete-user-handler req)))
+             (context "/campaign" []
+               (POST "/" req (add-campaign-handler req))
+               (PUT "/:campaign-id" req (update-campaign-handler req))
+               (DELETE "/:campaign-id" req (delete-campaign-handler req))
+               (GET "/:campaign-id" req (response (get-campaign req)))
+               (GET "/all" req (response (get-all-campaigns req))))
              (context "/character" []
                (POST "/" req (add-character-handler req))
                (PUT "/:id" req (update-character-handler req))
                (DELETE "/:id" req (delete-character-handler req))
-               (GET "/all" req (response (get-all-characters req)))))
+               (GET "/all" req (response (get-all-characters req)))
+               (context "/:id/container" []
+                 (POST "/" req (add-container-handler req))
+                 (PUT "/:container-id" req (update-container-handler req))
+                 (DELETE "/:container-id" req (delete-container-handler req))
+                 (GET "/all" req (response (get-all-containers req))))))
            (route/not-found "Error, page not found!"))
 
 (defn -main

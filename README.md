@@ -1,6 +1,6 @@
 # Oathbringer-backend
 
-A basic Clojure REST API Implementation using Compojure and HTTPKit
+A basic Clojure REST API Implementation using Compojure and Ring/HTTPKit
 
 ## Installation
 
