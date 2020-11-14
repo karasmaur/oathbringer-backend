@@ -10,17 +10,17 @@
 (defn get-container-data [container] {:external-id (nano-id 10)
                                       :name (str (container :name ))
                                       :main (container :main)
-                                      :max-capacity (container :max-capacity)
-                                      :current-total-weight (container :current-total-weight)
-                                      :over-encumbered (container :over-encumbered)
+                                      :max-capacity (container :maxCapacity)
+                                      :current-total-weight (container :currentTotalWeight)
+                                      :over-encumbered (container :overEncumbered)
                                       :items []})
 
 (defn get-container-dto [container] {:external-id (get container "external-id")
                                      :name (get container "name")
                                      :main (get container "main")
-                                     :max-capacity (get container "max-capacity")
-                                     :current-total-weight (get container "current-total-weight")
-                                     :over-encumbered (get container "over-encumbered")
+                                     :maxCapacity (get container "max-capacity")
+                                     :currentTotalWeight (get container "current-total-weight")
+                                     :overEncumbered (get container "over-encumbered")
                                      :items (get container "items")})
 
 (defn create-container [char-external-id container]

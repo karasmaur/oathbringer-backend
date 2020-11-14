@@ -9,6 +9,7 @@
             [oathbringer.service.user :refer :all]
             [oathbringer.service.character :refer :all]
             [oathbringer.service.container :refer :all]
+            [oathbringer.service.campaign :refer :all]
             [buddy.auth.accessrules :refer (wrap-access-rules)]
             [oathbringer.middleware.error-handling :refer [wrap-error-handling]])
   (:gen-class))
@@ -24,8 +25,8 @@
                (POST "/" req (add-campaign-handler req))
                (PUT "/:campaign-id" req (update-campaign-handler req))
                (DELETE "/:campaign-id" req (delete-campaign-handler req))
-               (GET "/:campaign-id" req (response (get-campaign req)))
-               (GET "/all" req (response (get-all-campaigns req))))
+               (GET "/all" req (response (get-all-campaigns req)))
+               (GET "/:campaign-id" req (response (get-campaign req))))
              (context "/character" []
                (POST "/" req (add-character-handler req))
                (PUT "/:id" req (update-character-handler req))

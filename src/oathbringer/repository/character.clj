@@ -1,6 +1,5 @@
 (ns oathbringer.repository.character
   (:require [oathbringer.util.db-util :refer :all]
-            [oathbringer.util.service-util :refer [response-payload]]
             [oathbringer.repository.user :refer [add-character-to-user
                                                  remove-character-from-user
                                                  find-characters-ids-from-user]]

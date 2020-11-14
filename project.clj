@@ -17,6 +17,7 @@
                  [nano-id "0.10.0"]
                  [buddy "2.0.0"]
  ]
+  :plugins [[lein-environ "1.1.0"]]
   :main ^:skip-aot oathbringer.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})

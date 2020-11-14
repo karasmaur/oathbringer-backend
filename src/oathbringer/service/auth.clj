@@ -15,7 +15,7 @@
 (defn get-jwt [req]
   "Returns the JWT from a ring request"
   (some->> (get-in req [:headers "authorization"])
-           (re-seq #"^Bearer\s+(.*)$")
+           (re-seq #"^(?:Bearer\s+)?(.+)$")
            first
            second))
 

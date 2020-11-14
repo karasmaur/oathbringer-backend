@@ -46,3 +46,16 @@
 
 (defn find-characters-ids-from-user [user-external-id]
   (get (find-in-db user-collection {:external-id user-external-id}) "characters"))
+
+(defn add-campaign-to-user [user-external-id campaign-id]
+  (update-embedded-array-to-db user-collection
+                               {:external-id user-external-id}
+                               {:campaigns {:campaign_id campaign-id}}))
+
+(defn remove-campaign-from-user [user-external-id campaign-id]
+  (remove-one-from-embedded-array-to-db user-collection
+                                        {:external-id user-external-id}
+                                        {:campaigns {:campaign_id campaign-id}}))
+
+(defn find-campaigns-ids-from-user [user-external-id]
+  (get (find-in-db user-collection {:external-id user-external-id}) "campaigns"))
