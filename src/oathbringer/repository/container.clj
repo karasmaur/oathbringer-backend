@@ -60,7 +60,5 @@
 (defn find-items-ids-from-container [container-external-id]
   (get (find-in-db container-collection {:external-id container-external-id}) "items"))
 
-
-
 (defn get-all-items-from-container [container-external-id]
   (map get-item-dto (map find-item-data (:_id (find-items-ids-from-container container-external-id)))))

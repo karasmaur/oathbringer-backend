@@ -52,4 +52,4 @@
                           "Item added"))))
 
 (defn get-all-container-items-handler [req]
-  )
+  (get-all-items-from-container (get-container-external-id req)))
