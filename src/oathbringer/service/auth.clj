@@ -4,7 +4,7 @@
             [clj-time.core :as time]))
 
 (def secret "b44c0a5b253a2ec35eb9a2c860cd2cd4db09c7e1e799084a")
-(def expiration-time 6000)
+(def expiration-time 9999999)
 
 (defn generate-signature [user]
   (jwt/sign user secret))

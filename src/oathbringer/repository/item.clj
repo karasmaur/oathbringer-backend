@@ -1,34 +1,39 @@
 (ns oathbringer.repository.item
-  (:require [oathbringer.util.db-util :refer [transact-single-entity query-db convert-datom-to-map]]
-            [nano-id.core :refer [nano-id]]))
+  (:require [oathbringer.db.core.db-util :refer :all]
+            [nano-id.core :refer [nano-id]]
+            [oathbringer.repository.campaign :refer [get-campaign-internal-id
+                                                     get-campaign-external-id-by-oid]]))
 
-(defn create-item-tx [item]
-  {:item/external-id (nano-id 10)
-   :item/name (item :name)
-   :item/weight (item :weight)})
+(def item-collection "items")
 
-(defn create-item [item]
-  (transact-single-entity (create-item-tx item)))
+(defn get-item-data [campaign-id item]
+  {:external-id (nano-id 10)
+   :name (str (item :name))
+   :weight (item :weight)
+   :campaign (get-campaign-internal-id campaign-id)})
 
-(def find-all-items
-  '[:find ?external-id ?name ?weight
-    :where
-    [?e :item/external-id ?external-id]
-    [?e :item/name ?name]
-    [?e :item/weight ?weight]])
+(defn get-item-data-for-update [item]
+  {:name (str (item :name))
+   :weight (item :weight)})
 
-(def item-schema
-  [;;Items
-   {:db/ident       :item/external-id
-    :db/valueType   :db.type/string
-    :db/unique      :db.unique/identity
-    :db/cardinality :db.cardinality/one
-    :db/doc         "An item's name"}
-   {:db/ident       :item/name
-    :db/valueType   :db.type/string
-    :db/cardinality :db.cardinality/one
-    :db/doc         "An item's name"}
-   {:db/ident       :item/weight
-    :db/valueType   :db.type/double
-    :db/cardinality :db.cardinality/one
-    :db/doc         "An item's weight"}])
+(defn get-item-dto [item] {:external-id (get item :external-id)
+                           :name (get item :name)
+                           :weight (get item :weight)})
+
+(defn create-item [campaign-external-id item]
+  (save-to-db item-collection
+              (get-item-data campaign-external-id item)))
+
+(defn update-item [item-external-id item]
+  (update-to-db item-collection
+                (find-oid-in-db item-collection {:external-id item-external-id})
+                (get-item-data-for-update item)))
+
+(defn get-item-internal-id [item-external-id]
+  (find-oid-in-db item-collection {:external-id item-external-id}))
+
+(defn get-all-items-by-campaign [campaign-external-id]
+  (map get-item-dto (find-all-in-db item-collection {:campaign (get-campaign-internal-id campaign-external-id)})))
+
+(defn find-item-data [container-id]
+  (find-in-db item-collection {:_id container-id}))

@@ -1,5 +1,5 @@
 (ns oathbringer.repository.campaign
-  (:require [oathbringer.util.db-util :refer :all]
+  (:require [oathbringer.db.core.db-util :refer :all]
             [oathbringer.repository.user :refer [add-campaign-to-user
                                                  remove-campaign-from-user
                                                  find-campaigns-ids-from-user]]
@@ -26,17 +26,23 @@
 (defn find-campaign-data [campaign-id]
   (find-in-db campaign-collection {:_id (get campaign-id "campaign_id")}))
 
+(defn get-campaign-internal-id [campaign-external-id]
+  (find-oid-in-db campaign-collection {:external-id campaign-external-id}))
+
+(defn get-campaign-external-id-by-oid [campaign-internal-id]
+  (find-oid-in-db campaign-collection {:id campaign-internal-id}))
+
 (defn get-all-campaigns-by-user [user-external-id]
   (map get-campaign-dto (map find-campaign-data (find-campaigns-ids-from-user user-external-id))))
 
 (defn update-campaign [campaign-external-id campaign]
   (update-to-db campaign-collection
-                (find-oid-in-db campaign-collection {:external-id campaign-external-id})
+                (get-campaign-internal-id campaign-external-id)
                 campaign))
 
 (defn delete-campaign [user-external-id campaign-external-id]
   (do
     (remove-campaign-from-user user-external-id
-                               (find-oid-in-db campaign-collection {:external-id campaign-external-id}))
+                               (get-campaign-internal-id campaign-external-id))
     (delete-from-db campaign-collection
-                    (find-oid-in-db campaign-collection {:external-id campaign-external-id}))))
+                    (get-campaign-internal-id campaign-external-id))))

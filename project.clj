@@ -15,9 +15,15 @@
                  [com.novemberain/monger "3.1.0"]
                  [ring/ring-json "0.3.1"]
                  [nano-id "0.10.0"]
-                 [buddy "2.0.0"]
- ]
-  :plugins [[lein-environ "1.1.0"]]
+                 [buddy "2.0.0"]]
+
   :main ^:skip-aot oathbringer.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:dev {:env {:environment "development"}}
+             :test {:env {:environment "test"}
+                    :dependencies [[pjstadig/humane-test-output "0.9.0"]]
+                    :injections [(require 'pjstadig.humane-test-output) (pjstadig.humane-test-output/activate!)]}
+             :prod {:env {:environment "production"}
+                    :uberjar-name "app-standalone.jar"
+                    :main main
+                    :aot :all}})

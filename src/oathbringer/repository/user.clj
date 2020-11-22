@@ -1,5 +1,5 @@
 (ns oathbringer.repository.user
-  (:require [oathbringer.util.db-util :refer :all]
+  (:require [oathbringer.db.core.db-util :refer :all]
             [nano-id.core :refer [nano-id]]
             [buddy.hashers :as hashers]))
 

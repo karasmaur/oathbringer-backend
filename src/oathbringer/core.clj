@@ -9,6 +9,7 @@
             [oathbringer.service.user :refer :all]
             [oathbringer.service.character :refer :all]
             [oathbringer.service.container :refer :all]
+            [oathbringer.service.item :refer :all]
             [oathbringer.service.campaign :refer :all]
             [buddy.auth.accessrules :refer (wrap-access-rules)]
             [oathbringer.middleware.error-handling :refer [wrap-error-handling]])
@@ -26,20 +27,28 @@
                (PUT "/:campaign-id" req (update-campaign-handler req))
                (DELETE "/:campaign-id" req (delete-campaign-handler req))
                (GET "/all" req (response (get-all-campaigns req)))
-               (GET "/:campaign-id" req (response (get-campaign req))))
-             (context "/character" []
-               (POST "/" req (add-character-handler req))
-               (PUT "/:id" req (update-character-handler req))
-               (DELETE "/:id" req (delete-character-handler req))
-               (GET "/all" req (response (get-all-characters req)))
-               (context "/:id/container" []
-                 (POST "/" req (add-container-handler req))
-                 (PUT "/:container-id" req (update-container-handler req))
-                 (DELETE "/:container-id" req (delete-container-handler req))
-                 (GET "/all" req (response (get-all-containers req))))))
+               (GET "/:campaign-id" req (response (get-campaign req)))
+               (context "/:campaign-id/character" []
+                 (POST "/" req (add-character-handler req))
+                 (PUT "/:char-id" req (update-character-handler req))
+                 (DELETE "/:char-id" req (delete-character-handler req))
+                 (GET "/all" req (response (get-all-characters req)))
+                 (context "/:char-id/container" []
+                   (POST "/" req (add-container-handler req))
+                   (PUT "/:container-id" req (update-container-handler req))
+                   (DELETE "/:container-id" req (delete-container-handler req))
+                   (GET "/all" req (response (get-all-containers req)))
+                   (context "/:container-id/item" []
+                     (POST "/" req (add-item-to-container-handler req))
+                     (GET "/all" req (response (get-all-container-items-handler req))))))
+               (context "/:campaign-id/item" []
+                 (POST "/" req (add-item-handler req))
+                 (PUT "/:item-id" req (update-item-handler req))
+                 (DELETE "/:item-id" req (delete-item-handler req))
+                 (GET "/all" req (response (get-all-campaign-items-handler req))))))
            (route/not-found "Error, page not found!"))
 
-(defn -main
+(defn main
   [& args]
   (let [port (Integer/parseInt (or (System/getenv "PORT") "3000"))]
     (server/run-server (-> #'app-routes

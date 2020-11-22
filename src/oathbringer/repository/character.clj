@@ -1,22 +1,29 @@
 (ns oathbringer.repository.character
-  (:require [oathbringer.util.db-util :refer :all]
+  (:require [oathbringer.db.core.db-util :refer :all]
             [oathbringer.repository.user :refer [add-character-to-user
                                                  remove-character-from-user
                                                  find-characters-ids-from-user]]
+            [oathbringer.repository.campaign :refer [get-campaign-internal-id
+                                                     get-campaign-external-id-by-oid]]
             [nano-id.core :refer [nano-id]]
             [clojure.pprint :as pp]))
 
 (def character-collection "characters")
 
-(defn get-char-data [char] {:external-id (nano-id 10)
-                            :name (str (char :name))
-                            :containers []})
+(defn get-char-data [campaign-id char]
+  {:external-id (nano-id 10)
+   :name (str (char :name))
+   :containers []
+   :campaign (get-campaign-internal-id campaign-id)})
 
 (defn get-char-dto [char] {:external-id (get char "external-id")
-                           :name (get char "name")})
+                           :name (get char "name")
+                           :campaign (get-campaign-external-id-by-oid (get char "campaign"))})
 
-(defn create-character [user-external-id char]
-  (add-character-to-user user-external-id (:_id (save-to-db character-collection (get-char-data char)))))
+(defn create-character [user-external-id campaign-external-id char]
+  (add-character-to-user user-external-id
+                         (:_id (save-to-db character-collection
+                                           (get-char-data campaign-external-id char)))))
 
 (defn find-character-data [character-id]
   (find-in-db character-collection {:_id (get character-id "character_id")}))

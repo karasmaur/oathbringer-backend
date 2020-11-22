@@ -2,16 +2,18 @@
   (:require
     [oathbringer.util.service-util :refer :all]
     [oathbringer.repository.character :refer :all]
+    [oathbringer.service.campaign :refer [get-campaign-external-id-from-req]]
     [oathbringer.service.auth :refer [get-user-external-id]]
     [clojure.pprint :as pp]))
 
 (defn get-char-external-id [req]
-  (:id (:params req)))
+  (:char-id (:params req)))
 
 (defn add-character-handler [req]
   (let [char (partial get-parameter req)
-        user-external-id (get-user-external-id req)]
-    (validate-db-return (create-character user-external-id char)
+        user-external-id (get-user-external-id req)
+        campaign-external-id (get-campaign-external-id-from-req req)]
+    (validate-db-return (create-character user-external-id campaign-external-id char)
                         200
                         "Character created!")))
 

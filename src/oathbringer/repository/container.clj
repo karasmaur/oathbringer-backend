@@ -1,5 +1,6 @@
 (ns oathbringer.repository.container
-  (:require [oathbringer.util.db-util :refer :all]
+  (:require [oathbringer.db.core.db-util :refer :all]
+            [oathbringer.repository.item :refer :all]
             [oathbringer.repository.character :refer [add-container-to-character
                                                       remove-container-from-character
                                                       find-containers-ids-from-char]]
@@ -43,3 +44,23 @@
                                      (find-oid-in-db container-collection {:external-id container-external-id}))
     (delete-from-db container-collection
                     (find-oid-in-db container-collection {:external-id container-external-id}))))
+
+(defn remove-item-from-container [container-external-id item-internal-id]
+  (remove-one-from-embedded-array-to-db container-collection
+                                        {:external-id container-external-id}
+                                        {:items {:item_id item-internal-id}}))
+
+(defn add-item-to-container [container-external-id item-internal-id quantity]
+  (do
+    (remove-item-from-container container-external-id item-internal-id)
+    (update-embedded-array-to-db-no-duplicate container-collection
+                                              {:external-id container-external-id}
+                                              {:items {:item_id item-internal-id :quantity quantity}})))
+
+(defn find-items-ids-from-container [container-external-id]
+  (get (find-in-db container-collection {:external-id container-external-id}) "items"))
+
+
+
+(defn get-all-items-from-container [container-external-id]
+  (map get-item-dto (map find-item-data (:_id (find-items-ids-from-container container-external-id)))))
