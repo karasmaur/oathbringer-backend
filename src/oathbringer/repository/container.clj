@@ -16,19 +16,18 @@
                                       :over-encumbered (container :overEncumbered)
                                       :items []})
 
-(defn get-container-dto [container] {:external-id (get container "external-id")
-                                     :name (get container "name")
-                                     :main (get container "main")
-                                     :maxCapacity (get container "max-capacity")
-                                     :currentTotalWeight (get container "current-total-weight")
-                                     :overEncumbered (get container "over-encumbered")
-                                     :items (get container "items")})
+(defn get-container-dto [container] {:external-id (:external-id container)
+                                     :name (:name container)
+                                     :main (:main container)
+                                     :maxCapacity (:max-capacity container)
+                                     :currentTotalWeight (:current-total-weight container)
+                                     :overEncumbered (:over-encumbered container)})
 
 (defn create-container [char-external-id container]
   (add-container-to-character char-external-id (:_id (save-to-db container-collection (get-container-data container)))))
 
 (defn find-container-data [container-id]
-  (find-in-db container-collection {:_id (get container-id "container_id")}))
+  (find-in-db container-collection {:_id (:container_id container-id)}))
 
 (defn get-all-containers-by-char [char-external-id]
   (map get-container-dto (map find-container-data (find-containers-ids-from-char char-external-id))))
@@ -58,7 +57,7 @@
                                               {:items {:item_id item-internal-id :quantity quantity}})))
 
 (defn find-items-ids-from-container [container-external-id]
-  (get (find-in-db container-collection {:external-id container-external-id}) "items"))
+  (:items (find-in-db container-collection {:external-id container-external-id})))
 
 (defn get-all-items-from-container [container-external-id]
-  (map get-item-dto (map find-item-data (:_id (find-items-ids-from-container container-external-id)))))
+  (map #(update % :item_id find-item-data) (find-items-ids-from-container container-external-id)))

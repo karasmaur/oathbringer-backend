@@ -6,10 +6,10 @@
 (def user-collection "users")
 
 (defn get-user-dto [user]
-  {:external-id (get user "external-id")
-   :name (get user "name")
-   :email (get user "email")
-   :password (get user "password")})
+  {:external-id (:external-id user )
+   :name (:name user)
+   :email (:email user)
+   :password (:password user)})
 
 (defn get-user-data [user] {:external-id (nano-id 10)
                             :email (str (user :email))
@@ -45,7 +45,7 @@
                                         {:characters {:character_id char-id}}))
 
 (defn find-characters-ids-from-user [user-external-id]
-  (get (find-in-db user-collection {:external-id user-external-id}) "characters"))
+  (:characters (find-in-db user-collection {:external-id user-external-id})))
 
 (defn add-campaign-to-user [user-external-id campaign-id]
   (update-embedded-array-to-db user-collection
@@ -58,4 +58,4 @@
                                         {:campaigns {:campaign_id campaign-id}}))
 
 (defn find-campaigns-ids-from-user [user-external-id]
-  (get (find-in-db user-collection {:external-id user-external-id}) "campaigns"))
+  (:campaigns (find-in-db user-collection {:external-id user-external-id})))

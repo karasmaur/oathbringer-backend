@@ -12,10 +12,10 @@
                                     :game-master (str (campaign :gameMaster))
                                     :game-type (str (campaign :gameType))})
 
-(defn get-campaign-dto [campaign] {:external-id (get campaign "external-id")
-                                   :name (get campaign "name")
-                                   :gameMaster (get campaign "game-master")
-                                   :gameType (get campaign "game-type")})
+(defn get-campaign-dto [campaign] {:external-id (:external-id campaign)
+                                   :name (:name campaign)
+                                   :gameMaster (:game-master campaign)
+                                   :gameType (:game-type campaign)})
 
 (defn create-campaign [user-external-id campaign]
   (add-campaign-to-user user-external-id (:_id (save-to-db campaign-collection (get-campaign-data campaign)))))
@@ -24,7 +24,7 @@
   (get-campaign-dto (find-in-db campaign-collection {:external-id campaign-external-id})))
 
 (defn find-campaign-data [campaign-id]
-  (find-in-db campaign-collection {:_id (get campaign-id "campaign_id")}))
+  (find-in-db campaign-collection {:_id (:campaign_id campaign-id)}))
 
 (defn get-campaign-internal-id [campaign-external-id]
   (find-oid-in-db campaign-collection {:external-id campaign-external-id}))

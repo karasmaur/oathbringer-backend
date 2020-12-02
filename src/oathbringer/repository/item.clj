@@ -35,5 +35,5 @@
 (defn get-all-items-by-campaign [campaign-external-id]
   (map get-item-dto (find-all-in-db item-collection {:campaign (get-campaign-internal-id campaign-external-id)})))
 
-(defn find-item-data [container-id]
-  (find-in-db item-collection {:_id container-id}))
+(defn find-item-data [item-id]
+  (get-item-dto (find-in-db item-collection {:_id item-id})))

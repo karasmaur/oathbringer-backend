@@ -16,9 +16,9 @@
    :containers []
    :campaign (get-campaign-internal-id campaign-id)})
 
-(defn get-char-dto [char] {:external-id (get char "external-id")
-                           :name (get char "name")
-                           :campaign (get-campaign-external-id-by-oid (get char "campaign"))})
+(defn get-char-dto [char] {:external-id (:external-id char)
+                           :name (:name char)
+                           :campaign (get-campaign-external-id-by-oid (:campaign char))})
 
 (defn create-character [user-external-id campaign-external-id char]
   (add-character-to-user user-external-id
@@ -26,7 +26,7 @@
                                            (get-char-data campaign-external-id char)))))
 
 (defn find-character-data [character-id]
-  (find-in-db character-collection {:_id (get character-id "character_id")}))
+  (find-in-db character-collection {:_id (:character_id character-id)}))
 
 (defn get-all-chars-by-user [user-external-id]
   (map get-char-dto (map find-character-data (find-characters-ids-from-user user-external-id))))
@@ -54,4 +54,4 @@
                                         {:containers {:container_id container-id}}))
 
 (defn find-containers-ids-from-char [char-external-id]
-  (get (find-in-db character-collection {:external-id char-external-id}) "containers"))
+  (:containers (find-in-db character-collection {:external-id char-external-id})))

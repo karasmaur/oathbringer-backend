@@ -28,7 +28,7 @@
 
 (defn save-to-db [collection data] (mc/save-and-return database collection data))
 
-(defn find-in-db [collection query] (mc/find-one database collection query))
+(defn find-in-db [collection query] (from-db-object (mc/find-one database collection query) true))
 
 (defn find-all-in-db [collection query] (mc/find-maps database collection query))
 
