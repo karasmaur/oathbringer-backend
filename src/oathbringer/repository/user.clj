@@ -6,7 +6,7 @@
 (def user-collection "users")
 
 (defn get-user-dto [user]
-  {:external-id (:external-id user )
+  {:external-id (:external-id user)
    :name (:name user)
    :email (:email user)
    :password (:password user)})

@@ -38,9 +38,11 @@
                    (PUT "/:container-id" req (update-container-handler req))
                    (DELETE "/:container-id" req (delete-container-handler req))
                    (GET "/all" req (response (get-all-containers req)))
+                   (GET "/:container-id" req (response (get-container-handler req)))
                    (context "/:container-id/item" []
                      (POST "/" req (add-item-to-container-handler req))
-                     (GET "/all" req (response (get-all-container-items-handler req))))))
+                     (GET "/all" req (response (get-all-container-items-handler req)))
+                     (DELETE "/:item-id" req (delete-item-from-container-handler req)))))
                (context "/:campaign-id/item" []
                  (POST "/" req (add-item-handler req))
                  (PUT "/:item-id" req (update-item-handler req))

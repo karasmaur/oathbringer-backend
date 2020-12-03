@@ -1,5 +1,6 @@
 (ns oathbringer.repository.container
-  (:require [oathbringer.db.core.db-util :refer :all]
+  (:require [clojure.set :refer [rename-keys]]
+            [oathbringer.db.core.db-util :refer :all]
             [oathbringer.repository.item :refer :all]
             [oathbringer.repository.character :refer [add-container-to-character
                                                       remove-container-from-character
@@ -16,12 +17,20 @@
                                       :over-encumbered (container :overEncumbered)
                                       :items []})
 
-(defn get-container-dto [container] {:external-id (:external-id container)
-                                     :name (:name container)
-                                     :main (:main container)
-                                     :maxCapacity (:max-capacity container)
-                                     :currentTotalWeight (:current-total-weight container)
-                                     :overEncumbered (:over-encumbered container)})
+(defn get-container-dto
+  ([container] {:externalId (:external-id container)
+                :name (:name container)
+                :main (:main container)
+                :maxCapacity (:max-capacity container)
+                :currentTotalWeight (:current-total-weight container)
+                :overEncumbered (:over-encumbered container)})
+  ([container items] {:externalId (:external-id container)
+                      :name (:name container)
+                      :main (:main container)
+                      :maxCapacity (:max-capacity container)
+                      :currentTotalWeight (:current-total-weight container)
+                      :overEncumbered (:over-encumbered container)
+                      :items items}))
 
 (defn create-container [char-external-id container]
   (add-container-to-character char-external-id (:_id (save-to-db container-collection (get-container-data container)))))
@@ -60,4 +69,16 @@
   (:items (find-in-db container-collection {:external-id container-external-id})))
 
 (defn get-all-items-from-container [container-external-id]
-  (map #(update % :item_id find-item-data) (find-items-ids-from-container container-external-id)))
+  (map #(update (rename-keys % {:item_id :item}) :item find-item-data) (find-items-ids-from-container container-external-id)))
+
+(defn calculate-current-total-weight [items]
+  (reduce + (map #(* (:quantity %) (:weight (:item %))) items)))
+
+(defn get-container [container-external-id]
+  (let [items (get-all-items-from-container container-external-id)
+        container-data (find-in-db container-collection {:external-id container-external-id})
+        new-current-total-weight (calculate-current-total-weight items)
+        new-over-encumbered (> new-current-total-weight (:max-capacity container-data))]
+    (get-container-dto
+      (assoc container-data :current-total-weight new-current-total-weight :over-encumbered new-over-encumbered)
+      items)))

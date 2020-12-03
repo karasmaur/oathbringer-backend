@@ -3,6 +3,7 @@
     [oathbringer.util.service-util :refer :all]
     [oathbringer.repository.container :refer :all]
     [oathbringer.repository.item :refer :all]
+    [oathbringer.service.item :refer :all]
     [oathbringer.service.campaign :refer [get-campaign-external-id-from-req]]
     [oathbringer.service.character :refer [get-char-external-id]]
     [oathbringer.service.auth :refer [get-user-external-id]]
@@ -51,5 +52,11 @@
                           200
                           "Item added"))))
 
+(defn delete-item-from-container-handler [req]
+  (remove-item-from-container (get-container-external-id req) (get-item-external-id req)))
+
 (defn get-all-container-items-handler [req]
   (get-all-items-from-container (get-container-external-id req)))
+
+(defn get-container-handler [req]
+  (get-container (get-container-external-id req)))

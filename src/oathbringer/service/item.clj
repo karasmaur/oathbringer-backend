@@ -3,6 +3,9 @@
             [oathbringer.service.campaign :refer [get-campaign-external-id-from-req]]
             [oathbringer.repository.item :refer :all]))
 
+(defn get-item-external-id [req]
+  (:item-id (:params req)))
+
 (defn add-item-handler [req]
   (let [item (partial get-parameter req)
         campaign-external-id (get-campaign-external-id-from-req req)]
